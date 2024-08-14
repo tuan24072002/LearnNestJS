@@ -11,3 +11,5 @@ services:
 
 volumes:
   mongodb_data_container:
+
+  # docker compose -p learn-nextjs-nestjs up -d
