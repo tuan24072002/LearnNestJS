@@ -8,3 +8,13 @@ export const hashPassword = (plainPassword: string) => {
     console.log(error);
   }
 };
+export const compareHashPassword = (
+  plainPassword: string,
+  hashPassword: string,
+) => {
+  try {
+    return bcrypt.compareSync(plainPassword, hashPassword);
+  } catch (error) {
+    console.log(error);
+  }
+};

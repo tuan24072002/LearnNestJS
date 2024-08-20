@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { hashPassword } from '@/utils/util';
 import aqp from 'api-query-params';
 
@@ -29,7 +29,7 @@ export class UsersService {
       );
     }
     //hash password
-    const hash = await hashPassword(password);
+    const hash = hashPassword(password);
     const user = await this.userModel.create({
       name,
       email,
@@ -40,6 +40,7 @@ export class UsersService {
     });
     return {
       id: user.id,
+      message: 'Đăng ký tài khoản thành công !',
     };
   }
 
@@ -63,16 +64,32 @@ export class UsersService {
     return { results, totalPages };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    return await this.userModel.findOne({ email });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    const updateUser = await this.userModel.updateOne(
+      { _id: updateUserDto._id },
+      { ...updateUserDto },
+    );
+    return {
+      info: updateUser,
+      message: 'Cập nhật người dùng thành công !',
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    //check _id
+    if (mongoose.isValidObjectId(id)) {
+      //delete
+      const deleteUser = await this.userModel.deleteOne({ _id: id });
+      return {
+        info: deleteUser,
+        message: `id: ${id} đã xóa thành công !`,
+      };
+    } else {
+      throw new BadRequestException(`id: ${id} không đúng định dạng !`);
+    }
   }
 }
