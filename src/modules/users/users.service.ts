@@ -6,7 +6,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { hashPassword } from '@/utils/util';
 import aqp from 'api-query-params';
-
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 @Injectable()
 export class UsersService {
   constructor(
@@ -40,7 +42,7 @@ export class UsersService {
     });
     return {
       id: user.id,
-      message: 'Đăng ký tài khoản thành công !',
+      message: 'Tạo tài khoản admin thành công !',
     };
   }
 
@@ -91,5 +93,32 @@ export class UsersService {
     } else {
       throw new BadRequestException(`id: ${id} không đúng định dạng !`);
     }
+  }
+  async register(registerDto: CreateAuthDto) {
+    const { name, email, password } = registerDto;
+    //check email
+    const isExist = await this.isEmailExist(email);
+
+    if (isExist) {
+      throw new BadRequestException(
+        `Email đã tồn tại: ${email}. Vui lòng sử dụng email khác !`,
+      );
+    }
+    //hash password
+    const hash = hashPassword(password);
+    const user = await this.userModel.create({
+      name,
+      email,
+      password: hash,
+      isActive: false,
+      codeId: uuidv4(),
+      codeExpired: dayjs().add(5, 'minutes'),
+    });
+    //Trả ra phản hồi
+    return {
+      _id: user._id,
+      message: 'Đăng ký tài khoản người dùng thành công !',
+    };
+    //Send email
   }
 }
