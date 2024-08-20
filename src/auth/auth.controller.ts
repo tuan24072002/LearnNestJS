@@ -10,10 +10,14 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { Public } from '@/decorator/customize';
 import { CreateAuthDto } from './dto/create-auth.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailerService: MailerService,
+  ) {}
   @Post('login')
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -30,5 +34,20 @@ export class AuthController {
   @Public()
   handleRegister(@Body() registerDto: CreateAuthDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Get('mail')
+  @Public()
+  testMail() {
+    this.mailerService
+      .sendMail({
+        to: '0995086534ts@gmail.com',
+        subject: 'Testing Nest MailerModule ✔',
+        text: 'welcome',
+        html: '<b>Hello world !</b>',
+      })
+      .then(() => {})
+      .catch(() => {});
+    return 'Gửi mail thành công';
   }
 }
