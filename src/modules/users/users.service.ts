@@ -59,7 +59,7 @@ export class UsersService {
       .find(filter)
       .limit(pageSize)
       .skip(skip)
-      // .select('-password')
+      .select('-password')
       .sort(sort as any);
     return { results, totalPages };
   }

@@ -16,7 +16,6 @@ import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   imports: [
-    AuthModule,
     UsersModule,
     LikesModule,
     MenuItemOptionsModule,
@@ -26,6 +25,7 @@ import { AuthModule } from '@/auth/auth.module';
     OrdersModule,
     RestaurantsModule,
     ReviewsModule,
+    AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
