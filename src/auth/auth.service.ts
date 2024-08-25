@@ -39,4 +39,7 @@ export class AuthService {
   async checkCode(code: CodeAuthDto) {
     return await this.usersService.handleActive(code);
   }
+  async resendCode(email: string) {
+    return await this.usersService.resendCode(email);
+  }
 }

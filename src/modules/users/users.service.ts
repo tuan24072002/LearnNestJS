@@ -165,4 +165,42 @@ export class UsersService {
       message: 'Kích hoạt tài khoản thành công !',
     };
   }
+  async resendCode(email: string) {
+    //Check user by email
+    const checkUser = await this.userModel.findOne({ email });
+    if (!checkUser) {
+      throw new BadRequestException('Không tồn tại người dùng !');
+    }
+    //Check đã xác thực hay chưa
+    if (checkUser.isActive) {
+      throw new BadRequestException('Tài khoản đã được kích hoạt !');
+    }
+    //Cập nhật lại code mới
+    const codeId = uuidv4();
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        codeId,
+        codeExpired: dayjs().add(5, 'minutes'),
+      },
+      { new: true },
+    );
+    //Send email
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        subject: 'Activate your account ✔',
+        template: 'register.hbs',
+        context: {
+          name: user?.name || user?.email,
+          activationCode: codeId,
+        },
+      })
+      .then(() => {})
+      .catch(() => {});
+    return {
+      _id: user._id,
+      message: 'Gửi lại mã code thành công !',
+    };
+  }
 }

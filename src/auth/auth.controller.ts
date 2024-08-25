@@ -41,7 +41,11 @@ export class AuthController {
   checkCode(@Body() codeAuthDto: CodeAuthDto) {
     return this.authService.checkCode(codeAuthDto);
   }
-
+  @Post('resend-code')
+  @Public()
+  resendCode(@Body('email') email: string) {
+    return this.authService.resendCode(email);
+  }
   @Get('mail')
   @Public()
   testMail() {
