@@ -14,7 +14,12 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix('api', { exclude: [''] });
-
+  app.enableCors({
+    origin: true,
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    credentials: true,
+  });
   await app.listen(port);
 }
 bootstrap();
